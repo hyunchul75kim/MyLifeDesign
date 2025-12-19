@@ -24,6 +24,8 @@
                         }
                     }
                 });
+                // 데이터 로드 후 합계 재계산
+                calculateTotals();
             } catch (e) {
                 console.error('데이터 로드 실패:', e);
             }
@@ -68,12 +70,26 @@
         document.getElementById('totalExpense').textContent = Math.round(totalExpense).toLocaleString();
     }
 
+    // 입력 값 검증 함수
+    function validateInput(input) {
+        if (input.type === 'number') {
+            let value = parseFloat(input.value) || 0;
+            if (value < 0) {
+                value = 0;
+                input.value = 0;
+            }
+            return value;
+        }
+        return input.value;
+    }
+
     // 이벤트 리스너 등록
     function setupEventListeners() {
         // 모든 입력 필드에 변경 이벤트 리스너 추가
         const inputs = document.querySelectorAll('input, textarea');
         inputs.forEach(input => {
             input.addEventListener('input', () => {
+                validateInput(input);
                 saveData();
                 if (input.id === 'cash' || input.id === 'pension' || input.id === 'otherAssets' ||
                     input.id === 'workIncome' || input.id === 'otherIncome' ||
@@ -81,6 +97,27 @@
                     calculateTotals();
                 }
             });
+            
+            // blur 이벤트로 포커스 잃을 때도 검증
+            if (input.type === 'number') {
+                input.addEventListener('blur', () => {
+                    validateInput(input);
+                    saveData();
+                });
+            }
+        });
+    }
+
+    // 네비게이션 활성 링크 설정
+    function setActiveNavLink() {
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll('.nav-link');
+        
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+            }
         });
     }
 
@@ -89,6 +126,7 @@
         loadData();
         setupEventListeners();
         calculateTotals();
+        setActiveNavLink();
     }
 
     // 페이지 로드 시 초기화
