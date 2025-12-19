@@ -89,14 +89,14 @@ body {
     background-color: var(--section-bg);
     border-radius: 8px;
     padding: 25px;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
     border: 1px solid var(--border-color);
 }
 
 .section-title {
     font-size: 24px;
-    font-weight: 600;
-    margin-bottom: 20px;
+    font-weight: 700;
+    margin-bottom: 25px;
     color: var(--text-color);
     border-bottom: 2px solid var(--primary-color);
     padding-bottom: 10px;
@@ -117,8 +117,9 @@ body {
 
 .summary-item label {
     font-size: 16px;
-    font-weight: 500;
-    color: #6b7280;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 4px;
 }
 
 .summary-item .input-field {
@@ -214,8 +215,9 @@ body {
 
 .asset-item label {
     font-size: 16px;
+    font-weight: 600;
     min-width: 100px;
-    color: var(--text-color);
+    color: #374151;
 }
 
 .asset-item .input-field {
@@ -380,13 +382,13 @@ body {
 }
 
 .result-value {
-    font-size: 28px;
+    font-size: 20px;
     font-weight: 700;
     color: var(--primary-color);
 }
 
 .result-value.large {
-    font-size: 36px;
+    font-size: 24px;
 }
 
 /* 정보 박스 */
@@ -435,6 +437,48 @@ body {
 }
 
 /* 반응형 디자인 */
+
+/* 태블릿 레이아웃 (768px ~ 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .stages-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .assets-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .health-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .memo-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .input-grid,
+    .result-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    body {
+        font-size: 17px;
+    }
+    
+    .page-title {
+        font-size: 28px;
+    }
+    
+    .section-title {
+        font-size: 22px;
+    }
+}
+
+/* 모바일 레이아웃 (< 768px) */
 @media (max-width: 768px) {
     body {
         font-size: 16px;

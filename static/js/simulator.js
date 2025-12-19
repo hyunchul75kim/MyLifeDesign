@@ -105,11 +105,25 @@
         });
     }
 
+    // 네비게이션 활성 링크 설정
+    function setActiveNavLink() {
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll('.nav-link');
+        
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+            }
+        });
+    }
+
     // 초기화
     function init() {
         loadData();
         setupEventListeners();
         calculate(); // 초기 계산
+        setActiveNavLink();
     }
 
     // 페이지 로드 시 초기화
