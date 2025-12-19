@@ -6,7 +6,6 @@ Flask 애플리케이션 설정 파일
 """
 
 import os
-from datetime import timedelta
 
 
 class Config:
