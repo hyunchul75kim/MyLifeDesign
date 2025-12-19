@@ -7,6 +7,38 @@
     // localStorage 키 (상수에서 가져오기)
     const STORAGE_KEY = window.STORAGE_KEYS ? window.STORAGE_KEYS.DASHBOARD : 'retirement_dashboard_data';
 
+    // DOM 요소 캐싱 (자주 사용되는 요소들)
+    let cachedElements = null;
+
+    /**
+     * DOM 요소 캐싱 (초기화 시 한 번만 실행)
+     */
+    function cacheElements() {
+        if (cachedElements) {
+            return cachedElements;
+        }
+
+        cachedElements = {
+            // 자산 관련
+            cash: window.safeGetElement('cash'),
+            pension: window.safeGetElement('pension'),
+            otherAssets: window.safeGetElement('otherAssets'),
+            totalAssets: window.safeGetElement('totalAssets'),
+            
+            // 수입 관련
+            workIncome: window.safeGetElement('workIncome'),
+            otherIncome: window.safeGetElement('otherIncome'),
+            totalIncome: window.safeGetElement('totalIncome'),
+            
+            // 지출 관련
+            fixedExpense: window.safeGetElement('fixedExpense'),
+            livingExpense: window.safeGetElement('livingExpense'),
+            totalExpense: window.safeGetElement('totalExpense')
+        };
+
+        return cachedElements;
+    }
+
     // 데이터 로드
     function loadData() {
         if (!window.isLocalStorageAvailable()) {
@@ -81,42 +113,31 @@
     // 자산 합계 계산
     function calculateTotals() {
         try {
-            // 자산 합계
-            const cashElement = window.safeGetElement('cash');
-            const pensionElement = window.safeGetElement('pension');
-            const otherAssetsElement = window.safeGetElement('otherAssets');
-            const totalAssetsElement = window.safeGetElement('totalAssets');
+            const elements = cacheElements();
 
-            if (cashElement && pensionElement && otherAssetsElement && totalAssetsElement) {
-                const cash = parseFloat(cashElement.value) || 0;
-                const pension = parseFloat(pensionElement.value) || 0;
-                const otherAssets = parseFloat(otherAssetsElement.value) || 0;
+            // 자산 합계
+            if (elements.cash && elements.pension && elements.otherAssets && elements.totalAssets) {
+                const cash = parseFloat(elements.cash.value) || 0;
+                const pension = parseFloat(elements.pension.value) || 0;
+                const otherAssets = parseFloat(elements.otherAssets.value) || 0;
                 const totalAssets = cash + pension + otherAssets;
-                totalAssetsElement.textContent = Math.round(totalAssets).toLocaleString();
+                elements.totalAssets.textContent = Math.round(totalAssets).toLocaleString();
             }
 
             // 수입 합계
-            const workIncomeElement = window.safeGetElement('workIncome');
-            const otherIncomeElement = window.safeGetElement('otherIncome');
-            const totalIncomeElement = window.safeGetElement('totalIncome');
-
-            if (workIncomeElement && otherIncomeElement && totalIncomeElement) {
-                const workIncome = parseFloat(workIncomeElement.value) || 0;
-                const otherIncome = parseFloat(otherIncomeElement.value) || 0;
+            if (elements.workIncome && elements.otherIncome && elements.totalIncome) {
+                const workIncome = parseFloat(elements.workIncome.value) || 0;
+                const otherIncome = parseFloat(elements.otherIncome.value) || 0;
                 const totalIncome = workIncome + otherIncome;
-                totalIncomeElement.textContent = Math.round(totalIncome).toLocaleString();
+                elements.totalIncome.textContent = Math.round(totalIncome).toLocaleString();
             }
 
             // 지출 합계
-            const fixedExpenseElement = window.safeGetElement('fixedExpense');
-            const livingExpenseElement = window.safeGetElement('livingExpense');
-            const totalExpenseElement = window.safeGetElement('totalExpense');
-
-            if (fixedExpenseElement && livingExpenseElement && totalExpenseElement) {
-                const fixedExpense = parseFloat(fixedExpenseElement.value) || 0;
-                const livingExpense = parseFloat(livingExpenseElement.value) || 0;
+            if (elements.fixedExpense && elements.livingExpense && elements.totalExpense) {
+                const fixedExpense = parseFloat(elements.fixedExpense.value) || 0;
+                const livingExpense = parseFloat(elements.livingExpense.value) || 0;
                 const totalExpense = fixedExpense + livingExpense;
-                totalExpenseElement.textContent = Math.round(totalExpense).toLocaleString();
+                elements.totalExpense.textContent = Math.round(totalExpense).toLocaleString();
             }
         } catch (e) {
             console.error('합계 계산 실패:', e);
@@ -141,30 +162,42 @@
     // 이벤트 리스너 등록
     function setupEventListeners() {
         // 모든 입력 필드에 변경 이벤트 리스너 추가
-        const inputs = document.querySelectorAll('input, textarea');
-        inputs.forEach(input => {
-            input.addEventListener('input', () => {
-                validateInput(input);
+        // 이벤트 위임을 사용하여 성능 최적화
+        const container = document.querySelector('.container');
+        if (!container) {
+            return;
+        }
+
+        // 합계 계산이 필요한 필드 ID 목록
+        const totalCalculationFields = ['cash', 'pension', 'otherAssets', 'workIncome', 'otherIncome', 'fixedExpense', 'livingExpense'];
+
+        // 이벤트 위임: container에서 이벤트를 캡처
+        container.addEventListener('input', function(e) {
+            const target = e.target;
+            if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+                validateInput(target);
                 saveData();
-                if (input.id === 'cash' || input.id === 'pension' || input.id === 'otherAssets' ||
-                    input.id === 'workIncome' || input.id === 'otherIncome' ||
-                    input.id === 'fixedExpense' || input.id === 'livingExpense') {
+                // 합계 계산이 필요한 필드인지 확인
+                if (target.id && totalCalculationFields.includes(target.id)) {
                     calculateTotals();
                 }
-            });
-            
-            // blur 이벤트로 포커스 잃을 때도 검증
-            if (input.type === 'number') {
-                input.addEventListener('blur', () => {
-                    validateInput(input);
-                    saveData();
-                });
             }
         });
+
+        // blur 이벤트도 위임
+        container.addEventListener('blur', function(e) {
+            const target = e.target;
+            if (target.tagName === 'INPUT' && target.type === 'number') {
+                validateInput(target);
+                saveData();
+            }
+        }, true); // 캡처 단계에서 처리
     }
 
     // 초기화
     function init() {
+        // DOM 요소 캐싱 (먼저 실행)
+        cacheElements();
         loadData();
         setupEventListeners();
         calculateTotals();

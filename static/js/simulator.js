@@ -7,6 +7,36 @@
     // localStorage 키 (상수에서 가져오기)
     const STORAGE_KEY = window.STORAGE_KEYS ? window.STORAGE_KEYS.SIMULATOR : 'retirement_simulator_data';
 
+    // DOM 요소 캐싱 (자주 사용되는 요소들)
+    let cachedElements = null;
+
+    /**
+     * DOM 요소 캐싱 (초기화 시 한 번만 실행)
+     */
+    function cacheElements() {
+        if (cachedElements) {
+            return cachedElements;
+        }
+
+        cachedElements = {
+            // 입력 필드
+            simCurrentAge: window.safeGetElement('simCurrentAge'),
+            simRetirementAge: window.safeGetElement('simRetirementAge'),
+            simMonthlyIncome: window.safeGetElement('simMonthlyIncome'),
+            simMonthlyExpense: window.safeGetElement('simMonthlyExpense'),
+            retirementPeriod: window.safeGetElement('retirementPeriod'),
+            annualReturn: window.safeGetElement('annualReturn'),
+            
+            // 결과 표시 필드
+            monthlySavings: window.safeGetElement('monthlySavings'),
+            monthsToRetirement: window.safeGetElement('monthsToRetirement'),
+            expectedAssets: window.safeGetElement('expectedAssets'),
+            monthlyLivingExpense: window.safeGetElement('monthlyLivingExpense')
+        };
+
+        return cachedElements;
+    }
+
     // 숫자 포맷팅 (만원 단위)
     function formatNumber(value) {
         const units = window.CURRENCY_UNITS || { HUNDRED_MILLION: 10000, TEN_MILLION: 1000 };
@@ -25,16 +55,11 @@
      * @returns {Object|null} 입력값 객체 또는 null (요소를 찾을 수 없는 경우)
      */
     function getInputValues() {
-        const currentAgeElement = window.safeGetElement('simCurrentAge');
-        const retirementAgeElement = window.safeGetElement('simRetirementAge');
-        const monthlyIncomeElement = window.safeGetElement('simMonthlyIncome');
-        const monthlyExpenseElement = window.safeGetElement('simMonthlyExpense');
-        const retirementPeriodElement = window.safeGetElement('retirementPeriod');
-        const annualReturnElement = window.safeGetElement('annualReturn');
+        const elements = cacheElements();
 
         // 필수 요소 확인
-        if (!currentAgeElement || !retirementAgeElement || !monthlyIncomeElement || 
-            !monthlyExpenseElement || !retirementPeriodElement || !annualReturnElement) {
+        if (!elements.simCurrentAge || !elements.simRetirementAge || !elements.simMonthlyIncome || 
+            !elements.simMonthlyExpense || !elements.retirementPeriod || !elements.annualReturn) {
             const errorMsg = window.ERROR_MESSAGES ? window.ERROR_MESSAGES.ELEMENT_NOT_FOUND : '필수 입력 요소를 찾을 수 없습니다.';
             console.error(errorMsg);
             return null;
@@ -48,12 +73,12 @@
         };
 
         return {
-            currentAge: parseFloat(currentAgeElement.value) || constants.MIN_VALUE,
-            retirementAge: parseFloat(retirementAgeElement.value) || constants.MIN_VALUE,
-            monthlyIncome: parseFloat(monthlyIncomeElement.value) || constants.MIN_VALUE,
-            monthlyExpense: parseFloat(monthlyExpenseElement.value) || constants.MIN_VALUE,
-            retirementPeriod: parseFloat(retirementPeriodElement.value) || constants.DEFAULT_RETIREMENT_PERIOD,
-            annualReturn: parseFloat(annualReturnElement.value) || constants.MIN_VALUE
+            currentAge: parseFloat(elements.simCurrentAge.value) || constants.MIN_VALUE,
+            retirementAge: parseFloat(elements.simRetirementAge.value) || constants.MIN_VALUE,
+            monthlyIncome: parseFloat(elements.simMonthlyIncome.value) || constants.MIN_VALUE,
+            monthlyExpense: parseFloat(elements.simMonthlyExpense.value) || constants.MIN_VALUE,
+            retirementPeriod: parseFloat(elements.retirementPeriod.value) || constants.DEFAULT_RETIREMENT_PERIOD,
+            annualReturn: parseFloat(elements.annualReturn.value) || constants.MIN_VALUE
         };
     }
 
@@ -83,16 +108,12 @@
     function displayErrorState() {
         const errorMessages = window.ERROR_MESSAGES || {};
         const inputError = errorMessages.INPUT_ERROR || '입력 오류';
+        const elements = cacheElements();
         
-        const monthlySavingsElement = window.safeGetElement('monthlySavings');
-        const monthsToRetirementElement = window.safeGetElement('monthsToRetirement');
-        const expectedAssetsElement = window.safeGetElement('expectedAssets');
-        const monthlyLivingExpenseElement = window.safeGetElement('monthlyLivingExpense');
-        
-        if (monthlySavingsElement) monthlySavingsElement.textContent = inputError;
-        if (monthsToRetirementElement) monthsToRetirementElement.textContent = inputError;
-        if (expectedAssetsElement) expectedAssetsElement.textContent = inputError;
-        if (monthlyLivingExpenseElement) monthlyLivingExpenseElement.textContent = inputError;
+        if (elements.monthlySavings) elements.monthlySavings.textContent = inputError;
+        if (elements.monthsToRetirement) elements.monthsToRetirement.textContent = inputError;
+        if (elements.expectedAssets) elements.expectedAssets.textContent = inputError;
+        if (elements.monthlyLivingExpense) elements.monthlyLivingExpense.textContent = inputError;
     }
 
     /**
@@ -147,22 +168,19 @@
      * @param {Object} results - 계산 결과 객체
      */
     function displayResults(results) {
-        const monthlySavingsElement = window.safeGetElement('monthlySavings');
-        const monthsToRetirementElement = window.safeGetElement('monthsToRetirement');
-        const expectedAssetsElement = window.safeGetElement('expectedAssets');
-        const monthlyLivingExpenseElement = window.safeGetElement('monthlyLivingExpense');
+        const elements = cacheElements();
 
-        if (monthlySavingsElement) {
-            monthlySavingsElement.textContent = formatNumber(results.monthlySavings);
+        if (elements.monthlySavings) {
+            elements.monthlySavings.textContent = formatNumber(results.monthlySavings);
         }
-        if (monthsToRetirementElement) {
-            monthsToRetirementElement.textContent = Math.round(results.monthsToRetirement).toLocaleString() + '개월';
+        if (elements.monthsToRetirement) {
+            elements.monthsToRetirement.textContent = Math.round(results.monthsToRetirement).toLocaleString() + '개월';
         }
-        if (expectedAssetsElement) {
-            expectedAssetsElement.textContent = formatNumber(results.expectedAssets);
+        if (elements.expectedAssets) {
+            elements.expectedAssets.textContent = formatNumber(results.expectedAssets);
         }
-        if (monthlyLivingExpenseElement) {
-            monthlyLivingExpenseElement.textContent = formatNumber(results.monthlyLivingExpense);
+        if (elements.monthlyLivingExpense) {
+            elements.monthlyLivingExpense.textContent = formatNumber(results.monthlyLivingExpense);
         }
     }
 
@@ -203,20 +221,15 @@
         }
 
         try {
-            const simCurrentAgeElement = window.safeGetElement('simCurrentAge');
-            const simRetirementAgeElement = window.safeGetElement('simRetirementAge');
-            const simMonthlyIncomeElement = window.safeGetElement('simMonthlyIncome');
-            const simMonthlyExpenseElement = window.safeGetElement('simMonthlyExpense');
-            const retirementPeriodElement = window.safeGetElement('retirementPeriod');
-            const annualReturnElement = window.safeGetElement('annualReturn');
+            const elements = cacheElements();
 
             const data = {};
-            if (simCurrentAgeElement) data.simCurrentAge = simCurrentAgeElement.value;
-            if (simRetirementAgeElement) data.simRetirementAge = simRetirementAgeElement.value;
-            if (simMonthlyIncomeElement) data.simMonthlyIncome = simMonthlyIncomeElement.value;
-            if (simMonthlyExpenseElement) data.simMonthlyExpense = simMonthlyExpenseElement.value;
-            if (retirementPeriodElement) data.retirementPeriod = retirementPeriodElement.value;
-            if (annualReturnElement) data.annualReturn = annualReturnElement.value;
+            if (elements.simCurrentAge) data.simCurrentAge = elements.simCurrentAge.value;
+            if (elements.simRetirementAge) data.simRetirementAge = elements.simRetirementAge.value;
+            if (elements.simMonthlyIncome) data.simMonthlyIncome = elements.simMonthlyIncome.value;
+            if (elements.simMonthlyExpense) data.simMonthlyExpense = elements.simMonthlyExpense.value;
+            if (elements.retirementPeriod) data.retirementPeriod = elements.retirementPeriod.value;
+            if (elements.annualReturn) data.annualReturn = elements.annualReturn.value;
 
             const saved = window.safeLocalStorageSet(STORAGE_KEY, data);
             if (!saved) {
@@ -261,17 +274,29 @@
 
     // 이벤트 리스너 설정
     function setupEventListeners() {
-        const inputs = document.querySelectorAll('#simCurrentAge, #simRetirementAge, #simMonthlyIncome, #simMonthlyExpense, #retirementPeriod, #annualReturn');
-        inputs.forEach(input => {
-            input.addEventListener('input', () => {
+        // 이벤트 위임을 사용하여 성능 최적화
+        const container = document.querySelector('.container');
+        if (!container) {
+            return;
+        }
+
+        // 입력 필드 ID 목록
+        const inputFieldIds = ['simCurrentAge', 'simRetirementAge', 'simMonthlyIncome', 'simMonthlyExpense', 'retirementPeriod', 'annualReturn'];
+
+        // 이벤트 위임: container에서 이벤트를 캡처
+        container.addEventListener('input', function(e) {
+            const target = e.target;
+            if (target.tagName === 'INPUT' && target.id && inputFieldIds.includes(target.id)) {
                 calculate();
                 saveData();
-            });
+            }
         });
     }
 
     // 초기화
     function init() {
+        // DOM 요소 캐싱 (먼저 실행)
+        cacheElements();
         loadData();
         setupEventListeners();
         calculate(); // 초기 계산
