@@ -1,0 +1,476 @@
+/* 개인 노후설계 관리 웹페이지 스타일 */
+/* UX/UI 원칙: 큰 글자, 색상 최소화 (흑백 + 포인트 1색), 정보 과다 방지 */
+
+:root {
+    --primary-color: #2563eb; /* 포인트 색상 (파란색) */
+    --text-color: #1f2937;
+    --bg-color: #ffffff;
+    --border-color: #e5e7eb;
+    --section-bg: #f9fafb;
+    --highlight-bg: #eff6ff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', sans-serif;
+    font-size: 18px; /* 50대 기준 큰 글자 */
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    padding-top: 70px; /* 네비게이션 공간 */
+}
+
+/* 네비게이션 */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--bg-color);
+    border-bottom: 2px solid var(--border-color);
+    z-index: 1000;
+    padding: 15px 0;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    gap: 20px;
+}
+
+.nav-link {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-color);
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.nav-link:hover {
+    background-color: var(--section-bg);
+}
+
+.nav-link.active {
+    color: var(--primary-color);
+    background-color: var(--highlight-bg);
+}
+
+/* 컨테이너 */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
+
+.page-title {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--text-color);
+}
+
+.page-subtitle {
+    font-size: 18px;
+    color: #6b7280;
+    margin-bottom: 30px;
+}
+
+/* 섹션 */
+.section {
+    background-color: var(--section-bg);
+    border-radius: 8px;
+    padding: 25px;
+    margin-bottom: 25px;
+    border: 1px solid var(--border-color);
+}
+
+.section-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--text-color);
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 10px;
+}
+
+/* 현재 상태 요약 */
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.summary-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.summary-item label {
+    font-size: 16px;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.summary-item .input-field {
+    font-size: 20px;
+    padding: 12px;
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    width: 100%;
+}
+
+.summary-item span {
+    font-size: 16px;
+    color: #6b7280;
+    margin-left: 5px;
+}
+
+/* 단계별 노후 계획 */
+.stages-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.stage-card {
+    background-color: var(--bg-color);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.stage-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.stage-number {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.stage-age {
+    font-size: 16px;
+    color: #6b7280;
+}
+
+.stage-goal {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 15px;
+    color: var(--text-color);
+}
+
+.stage-memo {
+    width: 100%;
+    font-size: 16px;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+/* 자산 & 수입 요약 */
+.assets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+.assets-category {
+    background-color: var(--bg-color);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.assets-category h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: var(--primary-color);
+}
+
+.asset-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.asset-item label {
+    font-size: 16px;
+    min-width: 100px;
+    color: var(--text-color);
+}
+
+.asset-item .input-field {
+    flex: 1;
+    font-size: 18px;
+    padding: 10px;
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+}
+
+.asset-item span {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.asset-total {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 2px solid var(--border-color);
+    font-size: 18px;
+}
+
+.asset-total strong {
+    color: var(--primary-color);
+}
+
+/* 건강 & 생활 관리 */
+.health-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.health-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.health-item label {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.health-item .input-field {
+    font-size: 18px;
+    padding: 12px;
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    width: 100%;
+}
+
+/* 메모 & 할 일 */
+.memo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.memo-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.memo-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.memo-item label {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.memo-textarea {
+    width: 100%;
+    font-size: 16px;
+    padding: 12px;
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+/* 시뮬레이터 페이지 */
+.input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.input-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.input-item label {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.input-field {
+    font-size: 18px;
+    padding: 12px;
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    width: 100%;
+}
+
+.input-field.large {
+    font-size: 22px;
+    padding: 15px;
+}
+
+.input-item span {
+    font-size: 16px;
+    color: #6b7280;
+    margin-left: 5px;
+}
+
+/* 계산 결과 */
+.result-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.result-card {
+    background-color: var(--bg-color);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 25px;
+    text-align: center;
+}
+
+.result-card.highlight {
+    background-color: var(--highlight-bg);
+    border-color: var(--primary-color);
+}
+
+.result-label {
+    font-size: 16px;
+    color: #6b7280;
+    margin-bottom: 15px;
+}
+
+.result-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.result-value.large {
+    font-size: 36px;
+}
+
+/* 정보 박스 */
+.info-box {
+    background-color: var(--bg-color);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.info-box h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: var(--text-color);
+}
+
+.info-list {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 15px;
+}
+
+.info-list li {
+    font-size: 16px;
+    padding: 8px 0;
+    padding-left: 25px;
+    position: relative;
+}
+
+.info-list li:before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.info-note {
+    font-size: 14px;
+    color: #6b7280;
+    font-style: italic;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    body {
+        font-size: 16px;
+        padding-top: 60px;
+    }
+
+    .page-title {
+        font-size: 26px;
+    }
+
+    .section-title {
+        font-size: 20px;
+    }
+
+    .summary-grid,
+    .stages-grid,
+    .assets-grid,
+    .health-grid,
+    .memo-grid,
+    .input-grid,
+    .result-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .nav-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+/* 입력 필드 포커스 스타일 */
+.input-field:focus,
+.stage-memo:focus,
+.memo-textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
