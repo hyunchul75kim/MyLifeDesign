@@ -245,6 +245,120 @@
 - [GREEN 단계 높은 우선순위 시나리오](./docs/Green_high_구현_시나리오.md): 높은 우선순위 구현 시나리오
 - [GREEN 단계 중간 우선순위 시나리오](./docs/Green_middle_구현_시나리오.md): 중간 우선순위 구현 시나리오
 
+## REFACTORING 단계 진행 목록
+
+코드 품질 개선 및 유지보수성 향상을 위한 리팩토링 작업 목록입니다. 자세한 분석 내용은 [Refactoring 스멜 분석](./docs/Refactoring_스멜분석.md) 문서를 참고하세요.
+
+### Phase 1: 공통 코드 분리 (우선순위 1) - 예상 소요 시간: 2시간
+
+**🔴 높은 우선순위 - 즉시 개선 권장**
+
+- [x] **JavaScript 공통 유틸리티 파일 생성**
+  - `static/js/common.js` 파일 생성
+  - `setActiveNavLink()` 함수 이동 (중복 코드 제거)
+  - `dashboard.js`, `simulator.js`에서 중복 함수 제거
+  - HTML 템플릿에 `common.js` 스크립트 태그 추가
+  - 예상 작업 시간: 30분
+  - 영향도: 높음 (유지보수성 향상)
+
+- [x] **Python 설정 파일 분리**
+  - `config.py` 파일 생성
+  - 개발/프로덕션/테스트 환경 설정 분리
+  - 환경 변수 지원 (포트, 호스트, 디버그 모드, 브라우저 자동 실행)
+  - 하드코딩된 설정값 제거 (포트, 호스트, 디버그 모드, 브라우저 대기 시간)
+  - `FLASK_ENV` 환경 변수로 환경 전환 가능
+  - 예상 작업 시간: 1시간
+  - 영향도: 높음 (배포 및 환경 관리 개선)
+
+- [x] **불필요한 코드 제거**
+  - `app.py`의 불필요한 `pass` 문 제거 (이미 제거됨)
+  - 조건문 개선 (가독성 향상) - 조건을 명확하게 정리
+  - 매직 넘버를 상수로 정의 (`BROWSER_OPEN_DELAY`는 `config.py`로 이동)
+  - `config.py`에서 사용하지 않는 import 제거 (`timedelta`)
+  - 예상 작업 시간: 10분
+  - 영향도: 중간 (가독성 향상)
+
+### Phase 2: 템플릿 구조 개선 (우선순위 2) - 예상 소요 시간: 3시간
+
+**🟡 중간 우선순위 - 단기 개선 권장**
+
+- [x] **HTML 베이스 템플릿 생성**
+  - `templates/base.html` 템플릿 생성
+  - 네비게이션 바 등 공통 부분 분리 (HTML 구조, CSS 링크, 공통 스크립트)
+  - Flask 템플릿 상속 구조 적용 (`{% extends %}`)
+  - `dashboard.html`, `simulator.html` 템플릿 리팩토링 (상속 구조로 변경)
+  - 블록 구조로 확장 가능한 템플릿 설계 (`{% block title %}`, `{% block content %}`, `{% block extra_scripts %}`)
+  - 예상 작업 시간: 1시간
+  - 영향도: 중간 (유지보수성 향상)
+
+- [x] **에러 처리 강화**
+  - localStorage 사용 가능 여부 확인 (`isLocalStorageAvailable()`)
+  - 안전한 localStorage 저장/로드 함수 추가 (`safeLocalStorageSet`, `safeLocalStorageGet`)
+  - JSON 파싱 에러 처리 개선 (손상된 데이터 자동 삭제)
+  - 사용자 친화적 에러 메시지 표시 (`showUserMessage()`)
+  - DOM 요소 존재 확인 (`safeGetElement()`)
+  - 계산 로직 에러 처리 강화 (무한대, NaN 체크)
+  - 저장 공간 부족 등 예외 상황 대응 로직 추가
+  - 예상 작업 시간: 2시간
+  - 영향도: 중간 (안정성 향상)
+
+### Phase 3: 코드 품질 개선 (우선순위 2-3) - 예상 소요 시간: 4시간
+
+**🟡 중간 우선순위 / 🟢 낮은 우선순위**
+
+- [x] **상수 관리 개선**
+  - `static/js/constants.js` 파일 생성 (모든 상수 중앙 관리)
+  - 매직 넘버를 상수로 정의 (통화 단위: `CURRENCY_UNITS`, 계산 상수: `CALCULATION_CONSTANTS`)
+  - localStorage 키를 중앙 관리 (`STORAGE_KEYS` 객체)
+  - 하드코딩된 문자열 상수화 (에러 메시지: `ERROR_MESSAGES`, 메시지 타입: `MESSAGE_TYPES`)
+  - 모든 JavaScript 파일에서 상수 사용하도록 리팩토링
+  - `base.html`에 `constants.js` 스크립트 추가 (로드 순서 보장)
+  - 예상 작업 시간: 1시간
+  - 영향도: 중간 (가독성 및 유지보수성 향상)
+
+- [x] **계산 로직 리팩토링**
+  - `simulator.js`의 `calculate()` 함수를 여러 함수로 분리
+  - `getInputValues()`: 입력값 가져오기 및 파싱
+  - `validateInputs()`: 입력값 검증 로직 분리
+  - `calculateRetirementData()`: 계산 로직 분리 (순수 함수)
+  - `displayResults()`: 결과 표시 로직 분리
+  - `displayErrorState()`: 에러 상태 표시 분리
+  - 함수 단일 책임 원칙 적용 (각 함수가 하나의 책임만 수행)
+  - 테스트 가능한 순수 함수로 계산 로직 분리
+  - 예상 작업 시간: 2시간
+  - 영향도: 중간 (테스트 용이성 및 유지보수성 향상)
+
+- [x] **DOM 쿼리 최적화**
+  - DOM 요소를 변수에 캐싱 (`cacheElements()` 함수)
+  - 반복적인 `document.getElementById()` 호출 최소화 (초기화 시 한 번만 쿼리)
+  - 이벤트 리스너 최적화 (이벤트 위임 패턴 적용)
+  - `dashboard.js`: 자산/수입/지출 관련 요소 캐싱
+  - `simulator.js`: 입력/결과 표시 요소 캐싱
+  - 이벤트 위임으로 동적 요소 처리 및 메모리 사용량 감소
+  - 예상 작업 시간: 1시간
+  - 영향도: 낮음 (현재 성능 문제 없음, 미미한 성능 향상)
+
+### 추가 권장 사항 (선택사항)
+
+**코드 품질 도구 도입:**
+- [ ] ESLint 설정 (JavaScript 코드 품질 검사)
+- [ ] Flake8 / Black 설정 (Python 코드 스타일 검사)
+- [ ] Prettier 설정 (코드 포맷팅 자동화)
+
+**테스트 코드 작성:**
+- [ ] JavaScript 계산 로직 단위 테스트
+- [ ] Flask 라우트 통합 테스트
+- [ ] 사용자 시나리오 E2E 테스트
+
+**문서화:**
+- [ ] Flask 라우트 API 문서화
+- [ ] JSDoc 형식 함수 주석 추가
+- [ ] README 리팩토링 내용 반영
+
+### REFACTORING 단계 상세 문서
+
+- [Refactoring 스멜 분석](./docs/Refactoring_스멜분석.md): 코드 스멜 분석 및 개선 제안 상세 리포트
+
 ## 상세 문서
 
 자세한 제품 요구사항은 [PRD.md](./docs/PRD.md)를 참고하세요.
