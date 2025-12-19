@@ -9,65 +9,115 @@
 
     // 데이터 로드
     function loadData() {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
+        if (!window.isLocalStorageAvailable()) {
+            window.showUserMessage('브라우저에서 데이터 저장 기능을 사용할 수 없습니다. 입력한 내용은 저장되지 않습니다.', 'warning');
+            return;
+        }
+
+        const data = window.safeLocalStorageGet(STORAGE_KEY);
+        if (data) {
             try {
-                const data = JSON.parse(saved);
                 // 각 필드에 저장된 값 적용
                 Object.keys(data).forEach(key => {
-                    const element = document.getElementById(key);
+                    const element = window.safeGetElement(key);
                     if (element) {
-                        if (element.type === 'checkbox') {
-                            element.checked = data[key];
-                        } else {
-                            element.value = data[key];
+                        try {
+                            if (element.type === 'checkbox') {
+                                element.checked = Boolean(data[key]);
+                            } else {
+                                element.value = String(data[key] || '');
+                            }
+                        } catch (e) {
+                            console.warn(`필드 설정 실패: ${key}`, e);
                         }
                     }
                 });
                 // 데이터 로드 후 합계 재계산
                 calculateTotals();
             } catch (e) {
-                console.error('데이터 로드 실패:', e);
+                console.error('데이터 적용 실패:', e);
+                window.showUserMessage('저장된 데이터를 불러오는 중 오류가 발생했습니다.', 'error');
             }
         }
     }
 
     // 데이터 저장
     function saveData() {
-        const data = {};
-        const inputs = document.querySelectorAll('input, textarea');
-        inputs.forEach(input => {
-            if (input.id) {
-                if (input.type === 'checkbox') {
-                    data[input.id] = input.checked;
-                } else {
-                    data[input.id] = input.value;
+        if (!window.isLocalStorageAvailable()) {
+            return; // 저장 불가능하면 조용히 실패
+        }
+
+        try {
+            const data = {};
+            const inputs = document.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                if (input.id) {
+                    try {
+                        if (input.type === 'checkbox') {
+                            data[input.id] = input.checked;
+                        } else {
+                            data[input.id] = input.value;
+                        }
+                    } catch (e) {
+                        console.warn(`필드 읽기 실패: ${input.id}`, e);
+                    }
                 }
+            });
+            
+            const saved = window.safeLocalStorageSet(STORAGE_KEY, data);
+            if (!saved) {
+                window.showUserMessage('데이터 저장에 실패했습니다. 브라우저 저장 공간을 확인해주세요.', 'warning');
             }
-        });
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        } catch (e) {
+            console.error('데이터 저장 중 오류:', e);
+            window.showUserMessage('데이터 저장 중 오류가 발생했습니다.', 'error');
+        }
     }
 
     // 자산 합계 계산
     function calculateTotals() {
-        // 자산 합계
-        const cash = parseFloat(document.getElementById('cash').value) || 0;
-        const pension = parseFloat(document.getElementById('pension').value) || 0;
-        const otherAssets = parseFloat(document.getElementById('otherAssets').value) || 0;
-        const totalAssets = cash + pension + otherAssets;
-        document.getElementById('totalAssets').textContent = Math.round(totalAssets).toLocaleString();
+        try {
+            // 자산 합계
+            const cashElement = window.safeGetElement('cash');
+            const pensionElement = window.safeGetElement('pension');
+            const otherAssetsElement = window.safeGetElement('otherAssets');
+            const totalAssetsElement = window.safeGetElement('totalAssets');
 
-        // 수입 합계
-        const workIncome = parseFloat(document.getElementById('workIncome').value) || 0;
-        const otherIncome = parseFloat(document.getElementById('otherIncome').value) || 0;
-        const totalIncome = workIncome + otherIncome;
-        document.getElementById('totalIncome').textContent = Math.round(totalIncome).toLocaleString();
+            if (cashElement && pensionElement && otherAssetsElement && totalAssetsElement) {
+                const cash = parseFloat(cashElement.value) || 0;
+                const pension = parseFloat(pensionElement.value) || 0;
+                const otherAssets = parseFloat(otherAssetsElement.value) || 0;
+                const totalAssets = cash + pension + otherAssets;
+                totalAssetsElement.textContent = Math.round(totalAssets).toLocaleString();
+            }
 
-        // 지출 합계
-        const fixedExpense = parseFloat(document.getElementById('fixedExpense').value) || 0;
-        const livingExpense = parseFloat(document.getElementById('livingExpense').value) || 0;
-        const totalExpense = fixedExpense + livingExpense;
-        document.getElementById('totalExpense').textContent = Math.round(totalExpense).toLocaleString();
+            // 수입 합계
+            const workIncomeElement = window.safeGetElement('workIncome');
+            const otherIncomeElement = window.safeGetElement('otherIncome');
+            const totalIncomeElement = window.safeGetElement('totalIncome');
+
+            if (workIncomeElement && otherIncomeElement && totalIncomeElement) {
+                const workIncome = parseFloat(workIncomeElement.value) || 0;
+                const otherIncome = parseFloat(otherIncomeElement.value) || 0;
+                const totalIncome = workIncome + otherIncome;
+                totalIncomeElement.textContent = Math.round(totalIncome).toLocaleString();
+            }
+
+            // 지출 합계
+            const fixedExpenseElement = window.safeGetElement('fixedExpense');
+            const livingExpenseElement = window.safeGetElement('livingExpense');
+            const totalExpenseElement = window.safeGetElement('totalExpense');
+
+            if (fixedExpenseElement && livingExpenseElement && totalExpenseElement) {
+                const fixedExpense = parseFloat(fixedExpenseElement.value) || 0;
+                const livingExpense = parseFloat(livingExpenseElement.value) || 0;
+                const totalExpense = fixedExpense + livingExpense;
+                totalExpenseElement.textContent = Math.round(totalExpense).toLocaleString();
+            }
+        } catch (e) {
+            console.error('합계 계산 실패:', e);
+            window.showUserMessage('합계 계산 중 오류가 발생했습니다.', 'error');
+        }
     }
 
     // 입력 값 검증 함수

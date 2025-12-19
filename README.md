@@ -291,11 +291,14 @@
   - 예상 작업 시간: 1시간
   - 영향도: 중간 (유지보수성 향상)
 
-- [ ] **에러 처리 강화**
-  - localStorage 사용 가능 여부 확인
-  - JSON 파싱 에러 처리 개선
-  - 사용자 친화적 에러 메시지 표시
-  - 예외 상황 대응 로직 추가
+- [x] **에러 처리 강화**
+  - localStorage 사용 가능 여부 확인 (`isLocalStorageAvailable()`)
+  - 안전한 localStorage 저장/로드 함수 추가 (`safeLocalStorageSet`, `safeLocalStorageGet`)
+  - JSON 파싱 에러 처리 개선 (손상된 데이터 자동 삭제)
+  - 사용자 친화적 에러 메시지 표시 (`showUserMessage()`)
+  - DOM 요소 존재 확인 (`safeGetElement()`)
+  - 계산 로직 에러 처리 강화 (무한대, NaN 체크)
+  - 저장 공간 부족 등 예외 상황 대응 로직 추가
   - 예상 작업 시간: 2시간
   - 영향도: 중간 (안정성 향상)
 
