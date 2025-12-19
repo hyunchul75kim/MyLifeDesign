@@ -20,91 +20,175 @@
         }
     }
 
-    // 계산 수행
-    function calculate() {
-        try {
-            // 입력값 가져오기
-            const currentAgeElement = window.safeGetElement('simCurrentAge');
-            const retirementAgeElement = window.safeGetElement('simRetirementAge');
-            const monthlyIncomeElement = window.safeGetElement('simMonthlyIncome');
-            const monthlyExpenseElement = window.safeGetElement('simMonthlyExpense');
-            const retirementPeriodElement = window.safeGetElement('retirementPeriod');
-            const annualReturnElement = window.safeGetElement('annualReturn');
+    /**
+     * 입력값 가져오기 및 파싱
+     * @returns {Object|null} 입력값 객체 또는 null (요소를 찾을 수 없는 경우)
+     */
+    function getInputValues() {
+        const currentAgeElement = window.safeGetElement('simCurrentAge');
+        const retirementAgeElement = window.safeGetElement('simRetirementAge');
+        const monthlyIncomeElement = window.safeGetElement('simMonthlyIncome');
+        const monthlyExpenseElement = window.safeGetElement('simMonthlyExpense');
+        const retirementPeriodElement = window.safeGetElement('retirementPeriod');
+        const annualReturnElement = window.safeGetElement('annualReturn');
 
-            // 필수 요소 확인
-            if (!currentAgeElement || !retirementAgeElement || !monthlyIncomeElement || 
-                !monthlyExpenseElement || !retirementPeriodElement || !annualReturnElement) {
-                const errorMsg = window.ERROR_MESSAGES ? window.ERROR_MESSAGES.ELEMENT_NOT_FOUND : '필수 입력 요소를 찾을 수 없습니다.';
-                console.error(errorMsg);
-                return;
-            }
+        // 필수 요소 확인
+        if (!currentAgeElement || !retirementAgeElement || !monthlyIncomeElement || 
+            !monthlyExpenseElement || !retirementPeriodElement || !annualReturnElement) {
+            const errorMsg = window.ERROR_MESSAGES ? window.ERROR_MESSAGES.ELEMENT_NOT_FOUND : '필수 입력 요소를 찾을 수 없습니다.';
+            console.error(errorMsg);
+            return null;
+        }
 
-            const constants = window.CALCULATION_CONSTANTS || { MONTHS_PER_YEAR: 12, PERCENTAGE_DIVISOR: 100, DEFAULT_RETIREMENT_PERIOD: 25, MIN_VALUE: 0 };
-            const errorMessages = window.ERROR_MESSAGES || {};
+        const constants = window.CALCULATION_CONSTANTS || { 
+            MONTHS_PER_YEAR: 12, 
+            PERCENTAGE_DIVISOR: 100, 
+            DEFAULT_RETIREMENT_PERIOD: 25, 
+            MIN_VALUE: 0 
+        };
 
-            const currentAge = parseFloat(currentAgeElement.value) || constants.MIN_VALUE;
-            const retirementAge = parseFloat(retirementAgeElement.value) || constants.MIN_VALUE;
-            const monthlyIncome = parseFloat(monthlyIncomeElement.value) || constants.MIN_VALUE;
-            const monthlyExpense = parseFloat(monthlyExpenseElement.value) || constants.MIN_VALUE;
-            const retirementPeriod = parseFloat(retirementPeriodElement.value) || constants.DEFAULT_RETIREMENT_PERIOD;
-            const annualReturn = parseFloat(annualReturnElement.value) || constants.MIN_VALUE;
+        return {
+            currentAge: parseFloat(currentAgeElement.value) || constants.MIN_VALUE,
+            retirementAge: parseFloat(retirementAgeElement.value) || constants.MIN_VALUE,
+            monthlyIncome: parseFloat(monthlyIncomeElement.value) || constants.MIN_VALUE,
+            monthlyExpense: parseFloat(monthlyExpenseElement.value) || constants.MIN_VALUE,
+            retirementPeriod: parseFloat(retirementPeriodElement.value) || constants.DEFAULT_RETIREMENT_PERIOD,
+            annualReturn: parseFloat(annualReturnElement.value) || constants.MIN_VALUE
+        };
+    }
 
-            // 유효성 검사
-            if (currentAge >= retirementAge) {
-                const errorMessage = errorMessages.AGE_VALIDATION || '현재 나이는 은퇴 나이보다 작아야 합니다.';
-                window.showUserMessage(errorMessage, window.MESSAGE_TYPES ? window.MESSAGE_TYPES.WARNING : 'warning');
-                const monthlySavingsElement = window.safeGetElement('monthlySavings');
-                const monthsToRetirementElement = window.safeGetElement('monthsToRetirement');
-                const expectedAssetsElement = window.safeGetElement('expectedAssets');
-                const monthlyLivingExpenseElement = window.safeGetElement('monthlyLivingExpense');
+    /**
+     * 입력값 유효성 검사
+     * @param {Object} inputs - 입력값 객체
+     * @returns {boolean} 유효성 검사 통과 여부
+     */
+    function validateInputs(inputs) {
+        if (!inputs) {
+            return false;
+        }
+
+        // 나이 유효성 검사
+        if (inputs.currentAge >= inputs.retirementAge) {
+            const errorMessage = window.ERROR_MESSAGES ? window.ERROR_MESSAGES.AGE_VALIDATION : '현재 나이는 은퇴 나이보다 작아야 합니다.';
+            window.showUserMessage(errorMessage, window.MESSAGE_TYPES ? window.MESSAGE_TYPES.WARNING : 'warning');
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 에러 상태 표시
+     */
+    function displayErrorState() {
+        const errorMessages = window.ERROR_MESSAGES || {};
+        const inputError = errorMessages.INPUT_ERROR || '입력 오류';
+        
+        const monthlySavingsElement = window.safeGetElement('monthlySavings');
+        const monthsToRetirementElement = window.safeGetElement('monthsToRetirement');
+        const expectedAssetsElement = window.safeGetElement('expectedAssets');
+        const monthlyLivingExpenseElement = window.safeGetElement('monthlyLivingExpense');
+        
+        if (monthlySavingsElement) monthlySavingsElement.textContent = inputError;
+        if (monthsToRetirementElement) monthsToRetirementElement.textContent = inputError;
+        if (expectedAssetsElement) expectedAssetsElement.textContent = inputError;
+        if (monthlyLivingExpenseElement) monthlyLivingExpenseElement.textContent = inputError;
+    }
+
+    /**
+     * 은퇴 관련 데이터 계산 (순수 함수)
+     * @param {Object} inputs - 입력값 객체
+     * @returns {Object} 계산 결과 객체
+     */
+    function calculateRetirementData(inputs) {
+        const constants = window.CALCULATION_CONSTANTS || { 
+            MONTHS_PER_YEAR: 12, 
+            PERCENTAGE_DIVISOR: 100 
+        };
+
+        // 기본 계산
+        const monthlySavings = inputs.monthlyIncome - inputs.monthlyExpense;
+        const monthsToRetirement = (inputs.retirementAge - inputs.currentAge) * constants.MONTHS_PER_YEAR;
+        
+        // 단순 계산: 월 저축액 × 남은 개월 수
+        let expectedAssets = monthlySavings * monthsToRetirement;
+        
+        // 수익률 적용 (간단한 복리 계산)
+        if (inputs.annualReturn > 0 && monthsToRetirement > 0) {
+            try {
+                const monthlyReturn = inputs.annualReturn / constants.PERCENTAGE_DIVISOR / constants.MONTHS_PER_YEAR;
+                // 복리 계산: FV = PV * (1 + r)^n
+                // 단순화: 평균 저축액에 대한 복리 효과
+                const avgSavings = monthlySavings * monthsToRetirement / 2;
+                expectedAssets = avgSavings * Math.pow(1 + monthlyReturn, monthsToRetirement);
                 
-                const inputError = errorMessages.INPUT_ERROR || '입력 오류';
-                if (monthlySavingsElement) monthlySavingsElement.textContent = inputError;
-                if (monthsToRetirementElement) monthsToRetirementElement.textContent = inputError;
-                if (expectedAssetsElement) expectedAssetsElement.textContent = inputError;
-                if (monthlyLivingExpenseElement) monthlyLivingExpenseElement.textContent = inputError;
-                return;
-            }
-
-            // 계산
-            const monthlySavings = monthlyIncome - monthlyExpense;
-            const monthsToRetirement = (retirementAge - currentAge) * constants.MONTHS_PER_YEAR;
-            
-            // 단순 계산: 월 저축액 × 남은 개월 수
-            // (수익률은 복잡하므로 단순화)
-            let expectedAssets = monthlySavings * monthsToRetirement;
-            
-            // 수익률 적용 (간단한 복리 계산)
-            if (annualReturn > 0 && monthsToRetirement > 0) {
-                try {
-                    const monthlyReturn = annualReturn / constants.PERCENTAGE_DIVISOR / constants.MONTHS_PER_YEAR;
-                    // 복리 계산: FV = PV * (1 + r)^n
-                    // 단순화: 평균 저축액에 대한 복리 효과
-                    const avgSavings = monthlySavings * monthsToRetirement / 2;
-                    expectedAssets = avgSavings * Math.pow(1 + monthlyReturn, monthsToRetirement);
-                    
-                    // 무한대나 NaN 체크
-                    if (!isFinite(expectedAssets) || isNaN(expectedAssets)) {
-                        expectedAssets = monthlySavings * monthsToRetirement;
-                    }
-                } catch (e) {
-                    console.warn('복리 계산 실패, 단순 계산 사용:', e);
+                // 무한대나 NaN 체크
+                if (!isFinite(expectedAssets) || isNaN(expectedAssets)) {
                     expectedAssets = monthlySavings * monthsToRetirement;
                 }
+            } catch (e) {
+                console.warn('복리 계산 실패, 단순 계산 사용:', e);
+                expectedAssets = monthlySavings * monthsToRetirement;
             }
-            
-            const monthlyLivingExpense = expectedAssets / (retirementPeriod * constants.MONTHS_PER_YEAR);
+        }
+        
+        const monthlyLivingExpense = expectedAssets / (inputs.retirementPeriod * constants.MONTHS_PER_YEAR);
 
-            // 결과 표시
-            const monthlySavingsElement = window.safeGetElement('monthlySavings');
-            const monthsToRetirementElement = window.safeGetElement('monthsToRetirement');
-            const expectedAssetsElement = window.safeGetElement('expectedAssets');
-            const monthlyLivingExpenseElement = window.safeGetElement('monthlyLivingExpense');
+        return {
+            monthlySavings: monthlySavings,
+            monthsToRetirement: monthsToRetirement,
+            expectedAssets: expectedAssets,
+            monthlyLivingExpense: monthlyLivingExpense
+        };
+    }
 
-            if (monthlySavingsElement) monthlySavingsElement.textContent = formatNumber(monthlySavings);
-            if (monthsToRetirementElement) monthsToRetirementElement.textContent = Math.round(monthsToRetirement).toLocaleString() + '개월';
-            if (expectedAssetsElement) expectedAssetsElement.textContent = formatNumber(expectedAssets);
-            if (monthlyLivingExpenseElement) monthlyLivingExpenseElement.textContent = formatNumber(monthlyLivingExpense);
+    /**
+     * 계산 결과 표시
+     * @param {Object} results - 계산 결과 객체
+     */
+    function displayResults(results) {
+        const monthlySavingsElement = window.safeGetElement('monthlySavings');
+        const monthsToRetirementElement = window.safeGetElement('monthsToRetirement');
+        const expectedAssetsElement = window.safeGetElement('expectedAssets');
+        const monthlyLivingExpenseElement = window.safeGetElement('monthlyLivingExpense');
+
+        if (monthlySavingsElement) {
+            monthlySavingsElement.textContent = formatNumber(results.monthlySavings);
+        }
+        if (monthsToRetirementElement) {
+            monthsToRetirementElement.textContent = Math.round(results.monthsToRetirement).toLocaleString() + '개월';
+        }
+        if (expectedAssetsElement) {
+            expectedAssetsElement.textContent = formatNumber(results.expectedAssets);
+        }
+        if (monthlyLivingExpenseElement) {
+            monthlyLivingExpenseElement.textContent = formatNumber(results.monthlyLivingExpense);
+        }
+    }
+
+    /**
+     * 계산 수행 (메인 함수)
+     * 입력값 가져오기 → 검증 → 계산 → 결과 표시
+     */
+    function calculate() {
+        try {
+            // 1. 입력값 가져오기
+            const inputs = getInputValues();
+            if (!inputs) {
+                return;
+            }
+
+            // 2. 입력값 검증
+            if (!validateInputs(inputs)) {
+                displayErrorState();
+                return;
+            }
+
+            // 3. 계산 수행
+            const results = calculateRetirementData(inputs);
+
+            // 4. 결과 표시
+            displayResults(results);
         } catch (e) {
             console.error('계산 실패:', e);
             const errorMsg = window.ERROR_MESSAGES ? window.ERROR_MESSAGES.CALCULATION_ERROR : '계산 중 오류가 발생했습니다. 입력값을 확인해주세요.';
