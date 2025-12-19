@@ -24,6 +24,8 @@
             simRetirementAge: window.safeGetElement('simRetirementAge'),
             simMonthlyIncome: window.safeGetElement('simMonthlyIncome'),
             simMonthlyExpense: window.safeGetElement('simMonthlyExpense'),
+            currentAssets: window.safeGetElement('currentAssets'),
+            totalPension: window.safeGetElement('totalPension'),
             retirementPeriod: window.safeGetElement('retirementPeriod'),
             annualReturn: window.safeGetElement('annualReturn'),
             
@@ -59,7 +61,8 @@
 
         // 필수 요소 확인
         if (!elements.simCurrentAge || !elements.simRetirementAge || !elements.simMonthlyIncome || 
-            !elements.simMonthlyExpense || !elements.retirementPeriod || !elements.annualReturn) {
+            !elements.simMonthlyExpense || !elements.currentAssets || !elements.totalPension ||
+            !elements.retirementPeriod || !elements.annualReturn) {
             const errorMsg = window.ERROR_MESSAGES ? window.ERROR_MESSAGES.ELEMENT_NOT_FOUND : '필수 입력 요소를 찾을 수 없습니다.';
             console.error(errorMsg);
             return null;
@@ -77,6 +80,8 @@
             retirementAge: parseFloat(elements.simRetirementAge.value) || constants.MIN_VALUE,
             monthlyIncome: parseFloat(elements.simMonthlyIncome.value) || constants.MIN_VALUE,
             monthlyExpense: parseFloat(elements.simMonthlyExpense.value) || constants.MIN_VALUE,
+            currentAssets: parseFloat(elements.currentAssets.value) || constants.MIN_VALUE,
+            totalPension: parseFloat(elements.totalPension.value) || constants.MIN_VALUE,
             retirementPeriod: parseFloat(elements.retirementPeriod.value) || constants.DEFAULT_RETIREMENT_PERIOD,
             annualReturn: parseFloat(elements.annualReturn.value) || constants.MIN_VALUE
         };
@@ -131,29 +136,41 @@
         const monthlySavings = inputs.monthlyIncome - inputs.monthlyExpense;
         const monthsToRetirement = (inputs.retirementAge - inputs.currentAge) * constants.MONTHS_PER_YEAR;
         
-        // 단순 계산: 월 저축액 × 남은 개월 수
-        let expectedAssets = monthlySavings * monthsToRetirement;
+        // 현재 자산을 포함한 총 저축액 계산
+        // 단순 계산: (현재 자산 + 월 저축액 × 남은 개월 수)
+        let futureSavings = monthlySavings * monthsToRetirement;
+        let expectedAssets = inputs.currentAssets + futureSavings;
         
         // 수익률 적용 (간단한 복리 계산)
         if (inputs.annualReturn > 0 && monthsToRetirement > 0) {
             try {
                 const monthlyReturn = inputs.annualReturn / constants.PERCENTAGE_DIVISOR / constants.MONTHS_PER_YEAR;
                 // 복리 계산: FV = PV * (1 + r)^n
-                // 단순화: 평균 저축액에 대한 복리 효과
+                // 현재 자산에 대한 복리 효과
+                const currentAssetsWithReturn = inputs.currentAssets * Math.pow(1 + monthlyReturn, monthsToRetirement);
+                
+                // 월 저축액에 대한 복리 효과 (평균 저축액 기준)
                 const avgSavings = monthlySavings * monthsToRetirement / 2;
-                expectedAssets = avgSavings * Math.pow(1 + monthlyReturn, monthsToRetirement);
+                const futureSavingsWithReturn = avgSavings * Math.pow(1 + monthlyReturn, monthsToRetirement);
+                
+                expectedAssets = currentAssetsWithReturn + futureSavingsWithReturn;
                 
                 // 무한대나 NaN 체크
                 if (!isFinite(expectedAssets) || isNaN(expectedAssets)) {
-                    expectedAssets = monthlySavings * monthsToRetirement;
+                    expectedAssets = inputs.currentAssets + futureSavings;
                 }
             } catch (e) {
                 console.warn('복리 계산 실패, 단순 계산 사용:', e);
-                expectedAssets = monthlySavings * monthsToRetirement;
+                expectedAssets = inputs.currentAssets + futureSavings;
             }
         }
         
-        const monthlyLivingExpense = expectedAssets / (inputs.retirementPeriod * constants.MONTHS_PER_YEAR);
+        // 은퇴 후 월 사용 가능 생활비 계산
+        // (예상 자산 ÷ 은퇴 후 기간) + (연금총액 ÷ 은퇴 후 기간)
+        const totalRetirementMonths = inputs.retirementPeriod * constants.MONTHS_PER_YEAR;
+        const monthlyAssetsIncome = expectedAssets / totalRetirementMonths;
+        const monthlyPensionIncome = inputs.totalPension / totalRetirementMonths;
+        const monthlyLivingExpense = monthlyAssetsIncome + monthlyPensionIncome;
 
         return {
             monthlySavings: monthlySavings,
@@ -228,6 +245,8 @@
             if (elements.simRetirementAge) data.simRetirementAge = elements.simRetirementAge.value;
             if (elements.simMonthlyIncome) data.simMonthlyIncome = elements.simMonthlyIncome.value;
             if (elements.simMonthlyExpense) data.simMonthlyExpense = elements.simMonthlyExpense.value;
+            if (elements.currentAssets) data.currentAssets = elements.currentAssets.value;
+            if (elements.totalPension) data.totalPension = elements.totalPension.value;
             if (elements.retirementPeriod) data.retirementPeriod = elements.retirementPeriod.value;
             if (elements.annualReturn) data.annualReturn = elements.annualReturn.value;
 
@@ -281,7 +300,7 @@
         }
 
         // 입력 필드 ID 목록
-        const inputFieldIds = ['simCurrentAge', 'simRetirementAge', 'simMonthlyIncome', 'simMonthlyExpense', 'retirementPeriod', 'annualReturn'];
+        const inputFieldIds = ['simCurrentAge', 'simRetirementAge', 'simMonthlyIncome', 'simMonthlyExpense', 'currentAssets', 'totalPension', 'retirementPeriod', 'annualReturn'];
 
         // 이벤트 위임: container에서 이벤트를 캡처
         container.addEventListener('input', function(e) {

@@ -3,12 +3,26 @@
 {% block title %}은퇴 후 생활비 시뮬레이터{% endblock %}
 
 {% block content %}
-    <h1 class="page-title">은퇴 후 생활비 시뮬레이터</h1>
-    <p class="page-subtitle">수입과 지출을 입력하면 은퇴 후 생활비를 즉시 계산합니다</p>
+    <div class="page-header">
+        <div class="page-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 3V21H21" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M7 16L12 11L16 15L21 10" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M21 10V3H14" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <div>
+            <h1 class="page-title">은퇴 후 생활비 시뮬레이터</h1>
+            <p class="page-subtitle">수입과 지출을 입력하면 은퇴 후 생활비를 즉시 계산합니다</p>
+        </div>
+    </div>
 
     <!-- 입력 영역 -->
     <section class="section">
-        <h2 class="section-title">입력 항목</h2>
+        <h2 class="section-title">
+            <span class="section-icon">✏️</span>
+            입력 항목
+        </h2>
         <div class="input-grid">
             <div class="input-item">
                 <label for="simCurrentAge">현재 나이</label>
@@ -30,12 +44,25 @@
                 <input type="number" id="simMonthlyExpense" value="350" class="input-field large" min="0">
                 <span>만원</span>
             </div>
+            <div class="input-item">
+                <label for="currentAssets">자산</label>
+                <input type="number" id="currentAssets" value="0" class="input-field large" min="0">
+                <span>만원</span>
+            </div>
+            <div class="input-item">
+                <label for="totalPension">연금총액</label>
+                <input type="number" id="totalPension" value="0" class="input-field large" min="0">
+                <span>만원</span>
+            </div>
         </div>
     </section>
 
     <!-- 고정값 설정 -->
     <section class="section">
-        <h2 class="section-title">설정값</h2>
+        <h2 class="section-title">
+            <span class="section-icon">⚙️</span>
+            설정값
+        </h2>
         <div class="input-grid">
             <div class="input-item">
                 <label for="retirementPeriod">은퇴 후 예상 기간</label>
@@ -52,21 +79,28 @@
 
     <!-- 계산 결과 -->
     <section class="section">
-        <h2 class="section-title">계산 결과</h2>
+        <h2 class="section-title">
+            <span class="section-icon">📈</span>
+            계산 결과
+        </h2>
         <div class="result-grid">
             <div class="result-card">
+                <div class="result-icon">💵</div>
                 <div class="result-label">현재 월 저축 가능액</div>
                 <div class="result-value" id="monthlySavings">150만원</div>
             </div>
             <div class="result-card">
+                <div class="result-icon">⏰</div>
                 <div class="result-label">은퇴까지 남은 개월 수</div>
                 <div class="result-value" id="monthsToRetirement">168개월</div>
             </div>
             <div class="result-card highlight">
+                <div class="result-icon">🏦</div>
                 <div class="result-label">은퇴 시 예상 자산</div>
                 <div class="result-value large" id="expectedAssets">25,200만원</div>
             </div>
             <div class="result-card highlight">
+                <div class="result-icon">📊</div>
                 <div class="result-label">은퇴 후 월 사용 가능 생활비</div>
                 <div class="result-value large" id="monthlyLivingExpense">84만원</div>
             </div>
@@ -80,8 +114,8 @@
             <ul class="info-list">
                 <li>월 저축액 = 월 수입 - 월 지출</li>
                 <li>은퇴까지 남은 개월 수 = (은퇴 나이 - 현재 나이) × 12</li>
-                <li>은퇴 시 예상 자산 = 월 저축액 × 남은 개월 수</li>
-                <li>은퇴 후 월 사용 가능 생활비 = 예상 자산 ÷ (은퇴 후 기간 × 12)</li>
+                <li>은퇴 시 예상 자산 = (현재 자산 + 월 저축액 × 남은 개월 수) × 수익률 적용</li>
+                <li>은퇴 후 월 사용 가능 생활비 = (예상 자산 ÷ (은퇴 후 기간 × 12)) + (연금총액 ÷ (은퇴 후 기간 × 12))</li>
             </ul>
             <p class="info-note">※ 이 계산은 참고 지표이며, 금융 상품의 정확한 수익률은 고려하지 않습니다.</p>
         </div>

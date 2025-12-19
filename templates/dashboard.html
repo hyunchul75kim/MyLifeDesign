@@ -3,11 +3,23 @@
 {% block title %}노후설계 대시보드{% endblock %}
 
 {% block content %}
-    <h1 class="page-title">노후설계 대시보드</h1>
+    <div class="page-header">
+        <div class="page-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <h1 class="page-title">노후설계 대시보드</h1>
+    </div>
 
     <!-- (1) 현재 상태 요약 영역 -->
     <section class="section">
-        <h2 class="section-title">현재 상태 요약</h2>
+        <h2 class="section-title">
+            <span class="section-icon">📊</span>
+            현재 상태 요약
+        </h2>
         <div class="summary-grid">
             <div class="summary-item">
                 <label>현재 나이</label>
@@ -38,13 +50,17 @@
 
     <!-- (2) 단계별 노후 계획 -->
     <section class="section">
-        <h2 class="section-title">단계별 노후 계획</h2>
+        <h2 class="section-title">
+            <span class="section-icon">📅</span>
+            단계별 노후 계획
+        </h2>
         <div class="stages-grid">
             <div class="stage-card">
                 <div class="stage-header">
                     <span class="stage-number">1단계</span>
                     <span class="stage-age">50~55세</span>
                 </div>
+                <div class="stage-icon">🔍</div>
                 <div class="stage-goal">자산 점검, 부채 정리</div>
                 <textarea class="stage-memo" id="stage1Memo" placeholder="최대 3줄 메모" rows="3" maxlength="150"></textarea>
             </div>
@@ -53,6 +69,7 @@
                     <span class="stage-number">2단계</span>
                     <span class="stage-age">56~60세</span>
                 </div>
+                <div class="stage-icon">💪</div>
                 <div class="stage-goal">수입 다변화, 건강관리</div>
                 <textarea class="stage-memo" id="stage2Memo" placeholder="최대 3줄 메모" rows="3" maxlength="150"></textarea>
             </div>
@@ -61,6 +78,7 @@
                     <span class="stage-number">3단계</span>
                     <span class="stage-age">61~65세</span>
                 </div>
+                <div class="stage-icon">✅</div>
                 <div class="stage-goal">은퇴 준비 완료</div>
                 <textarea class="stage-memo" id="stage3Memo" placeholder="최대 3줄 메모" rows="3" maxlength="150"></textarea>
             </div>
@@ -69,6 +87,7 @@
                     <span class="stage-number">4단계</span>
                     <span class="stage-age">66세~</span>
                 </div>
+                <div class="stage-icon">🌅</div>
                 <div class="stage-goal">안정적 생활 유지</div>
                 <textarea class="stage-memo" id="stage4Memo" placeholder="최대 3줄 메모" rows="3" maxlength="150"></textarea>
             </div>
@@ -77,10 +96,16 @@
 
     <!-- (3) 자산 & 수입 요약 -->
     <section class="section">
-        <h2 class="section-title">자산 & 수입 요약</h2>
+        <h2 class="section-title">
+            <span class="section-icon">💰</span>
+            자산 & 수입 요약
+        </h2>
         <div class="assets-grid">
             <div class="assets-category">
-                <h3>자산</h3>
+                <h3>
+                    <span class="category-icon">💼</span>
+                    자산
+                </h3>
                 <div class="asset-item">
                     <label>현금/예금</label>
                     <input type="number" id="cash" value="5000" class="input-field" min="0">
@@ -101,7 +126,10 @@
                 </div>
             </div>
             <div class="assets-category">
-                <h3>수입</h3>
+                <h3>
+                    <span class="category-icon">📈</span>
+                    수입
+                </h3>
                 <div class="asset-item">
                     <label>근로 소득</label>
                     <input type="number" id="workIncome" value="500" class="input-field" min="0">
@@ -117,7 +145,10 @@
                 </div>
             </div>
             <div class="assets-category">
-                <h3>지출</h3>
+                <h3>
+                    <span class="category-icon">💳</span>
+                    지출
+                </h3>
                 <div class="asset-item">
                     <label>고정 지출</label>
                     <input type="number" id="fixedExpense" value="200" class="input-field" min="0">
@@ -137,7 +168,10 @@
 
     <!-- (4) 건강 & 생활 관리 -->
     <section class="section">
-        <h2 class="section-title">건강 & 생활 관리</h2>
+        <h2 class="section-title">
+            <span class="section-icon">🏃</span>
+            건강 & 생활 관리
+        </h2>
         <div class="health-grid">
             <div class="health-item">
                 <label class="checkbox-label">
@@ -162,7 +196,10 @@
 
     <!-- (5) 메모 & 할 일 -->
     <section class="section">
-        <h2 class="section-title">메모 & 할 일</h2>
+        <h2 class="section-title">
+            <span class="section-icon">📝</span>
+            메모 & 할 일
+        </h2>
         <div class="memo-grid">
             <div class="memo-item">
                 <label>올해의 핵심 목표</label>
