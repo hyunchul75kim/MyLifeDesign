@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>은퇴 후 생활비 시뮬레이터</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- 네비게이션 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-link">대시보드</a>
+            <a href="/simulator" class="nav-link active">생활비 계산</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="page-title">은퇴 후 생활비 시뮬레이터</h1>
+        <p class="page-subtitle">수입과 지출을 입력하면 은퇴 후 생활비를 즉시 계산합니다</p>
+
+        <!-- 입력 영역 -->
+        <section class="section">
+            <h2 class="section-title">입력 항목</h2>
+            <div class="input-grid">
+                <div class="input-item">
+                    <label for="simCurrentAge">현재 나이</label>
+                    <input type="number" id="simCurrentAge" value="51" class="input-field large" min="0" max="100">
+                    <span>세</span>
+                </div>
+                <div class="input-item">
+                    <label for="simRetirementAge">은퇴 나이</label>
+                    <input type="number" id="simRetirementAge" value="65" class="input-field large" min="0" max="100">
+                    <span>세</span>
+                </div>
+                <div class="input-item">
+                    <label for="simMonthlyIncome">월 수입</label>
+                    <input type="number" id="simMonthlyIncome" value="500" class="input-field large" min="0">
+                    <span>만원</span>
+                </div>
+                <div class="input-item">
+                    <label for="simMonthlyExpense">월 지출</label>
+                    <input type="number" id="simMonthlyExpense" value="350" class="input-field large" min="0">
+                    <span>만원</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 고정값 설정 -->
+        <section class="section">
+            <h2 class="section-title">설정값</h2>
+            <div class="input-grid">
+                <div class="input-item">
+                    <label for="retirementPeriod">은퇴 후 예상 기간</label>
+                    <input type="number" id="retirementPeriod" value="25" class="input-field" min="1" max="50">
+                    <span>년</span>
+                </div>
+                <div class="input-item">
+                    <label for="annualReturn">연 평균 수익률</label>
+                    <input type="number" id="annualReturn" value="3.5" class="input-field" min="0" max="10" step="0.1">
+                    <span>%</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 계산 결과 -->
+        <section class="section">
+            <h2 class="section-title">계산 결과</h2>
+            <div class="result-grid">
+                <div class="result-card">
+                    <div class="result-label">현재 월 저축 가능액</div>
+                    <div class="result-value" id="monthlySavings">150만원</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">은퇴까지 남은 개월 수</div>
+                    <div class="result-value" id="monthsToRetirement">168개월</div>
+                </div>
+                <div class="result-card highlight">
+                    <div class="result-label">은퇴 시 예상 자산</div>
+                    <div class="result-value large" id="expectedAssets">25,200만원</div>
+                </div>
+                <div class="result-card highlight">
+                    <div class="result-label">은퇴 후 월 사용 가능 생활비</div>
+                    <div class="result-value large" id="monthlyLivingExpense">84만원</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 계산 설명 -->
+        <section class="section">
+            <div class="info-box">
+                <h3>계산 방법</h3>
+                <ul class="info-list">
+                    <li>월 저축액 = 월 수입 - 월 지출</li>
+                    <li>은퇴까지 남은 개월 수 = (은퇴 나이 - 현재 나이) × 12</li>
+                    <li>은퇴 시 예상 자산 = 월 저축액 × 남은 개월 수</li>
+                    <li>은퇴 후 월 사용 가능 생활비 = 예상 자산 ÷ (은퇴 후 기간 × 12)</li>
+                </ul>
+                <p class="info-note">※ 이 계산은 참고 지표이며, 금융 상품의 정확한 수익률은 고려하지 않습니다.</p>
+            </div>
+        </section>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/simulator.js') }}"></script>
+</body>
+</html>
+
