@@ -1,200 +1,185 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>노후설계 대시보드</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-    <!-- 네비게이션 -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="/" class="nav-link active">대시보드</a>
-            <a href="/simulator" class="nav-link">생활비 계산</a>
+{% extends "base.html" %}
+
+{% block title %}노후설계 대시보드{% endblock %}
+
+{% block content %}
+    <h1 class="page-title">노후설계 대시보드</h1>
+
+    <!-- (1) 현재 상태 요약 영역 -->
+    <section class="section">
+        <h2 class="section-title">현재 상태 요약</h2>
+        <div class="summary-grid">
+            <div class="summary-item">
+                <label>현재 나이</label>
+                <input type="number" id="currentAge" value="51" class="input-field" min="0" max="100">
+                <span>세</span>
+            </div>
+            <div class="summary-item">
+                <label>목표 은퇴 나이</label>
+                <input type="number" id="retirementAge" value="65" class="input-field" min="0" max="100">
+                <span>세</span>
+            </div>
+            <div class="summary-item">
+                <label>현재 직업/상태</label>
+                <input type="text" id="currentJob" value="직장인" class="input-field">
+            </div>
+            <div class="summary-item">
+                <label>월 평균 수입</label>
+                <input type="number" id="monthlyIncome" value="500" class="input-field" min="0">
+                <span>만원</span>
+            </div>
+            <div class="summary-item">
+                <label>월 평균 지출</label>
+                <input type="number" id="monthlyExpense" value="350" class="input-field" min="0">
+                <span>만원</span>
+            </div>
         </div>
-    </nav>
+    </section>
 
-    <div class="container">
-        <h1 class="page-title">노후설계 대시보드</h1>
+    <!-- (2) 단계별 노후 계획 -->
+    <section class="section">
+        <h2 class="section-title">단계별 노후 계획</h2>
+        <div class="stages-grid">
+            <div class="stage-card">
+                <div class="stage-header">
+                    <span class="stage-number">1단계</span>
+                    <span class="stage-age">50~55세</span>
+                </div>
+                <div class="stage-goal">자산 점검, 부채 정리</div>
+                <textarea class="stage-memo" id="stage1Memo" placeholder="최대 3줄 메모" rows="3" maxlength="150"></textarea>
+            </div>
+            <div class="stage-card">
+                <div class="stage-header">
+                    <span class="stage-number">2단계</span>
+                    <span class="stage-age">56~60세</span>
+                </div>
+                <div class="stage-goal">수입 다변화, 건강관리</div>
+                <textarea class="stage-memo" id="stage2Memo" placeholder="최대 3줄 메모" rows="3" maxlength="150"></textarea>
+            </div>
+            <div class="stage-card">
+                <div class="stage-header">
+                    <span class="stage-number">3단계</span>
+                    <span class="stage-age">61~65세</span>
+                </div>
+                <div class="stage-goal">은퇴 준비 완료</div>
+                <textarea class="stage-memo" id="stage3Memo" placeholder="최대 3줄 메모" rows="3" maxlength="150"></textarea>
+            </div>
+            <div class="stage-card">
+                <div class="stage-header">
+                    <span class="stage-number">4단계</span>
+                    <span class="stage-age">66세~</span>
+                </div>
+                <div class="stage-goal">안정적 생활 유지</div>
+                <textarea class="stage-memo" id="stage4Memo" placeholder="최대 3줄 메모" rows="3" maxlength="150"></textarea>
+            </div>
+        </div>
+    </section>
 
-        <!-- (1) 현재 상태 요약 영역 -->
-        <section class="section">
-            <h2 class="section-title">현재 상태 요약</h2>
-            <div class="summary-grid">
-                <div class="summary-item">
-                    <label>현재 나이</label>
-                    <input type="number" id="currentAge" value="51" class="input-field" min="0" max="100">
-                    <span>세</span>
-                </div>
-                <div class="summary-item">
-                    <label>목표 은퇴 나이</label>
-                    <input type="number" id="retirementAge" value="65" class="input-field" min="0" max="100">
-                    <span>세</span>
-                </div>
-                <div class="summary-item">
-                    <label>현재 직업/상태</label>
-                    <input type="text" id="currentJob" value="직장인" class="input-field">
-                </div>
-                <div class="summary-item">
-                    <label>월 평균 수입</label>
-                    <input type="number" id="monthlyIncome" value="500" class="input-field" min="0">
+    <!-- (3) 자산 & 수입 요약 -->
+    <section class="section">
+        <h2 class="section-title">자산 & 수입 요약</h2>
+        <div class="assets-grid">
+            <div class="assets-category">
+                <h3>자산</h3>
+                <div class="asset-item">
+                    <label>현금/예금</label>
+                    <input type="number" id="cash" value="5000" class="input-field" min="0">
                     <span>만원</span>
                 </div>
-                <div class="summary-item">
-                    <label>월 평균 지출</label>
-                    <input type="number" id="monthlyExpense" value="350" class="input-field" min="0">
+                <div class="asset-item">
+                    <label>연금</label>
+                    <input type="number" id="pension" value="3000" class="input-field" min="0">
                     <span>만원</span>
                 </div>
-            </div>
-        </section>
-
-        <!-- (2) 단계별 노후 계획 -->
-        <section class="section">
-            <h2 class="section-title">단계별 노후 계획</h2>
-            <div class="stages-grid">
-                <div class="stage-card">
-                    <div class="stage-header">
-                        <span class="stage-number">1단계</span>
-                        <span class="stage-age">50~55세</span>
-                    </div>
-                    <div class="stage-goal">자산 점검, 부채 정리</div>
-                    <textarea class="stage-memo" id="stage1Memo" placeholder="최대 3줄 메모" rows="3" maxlength="150"></textarea>
+                <div class="asset-item">
+                    <label>기타 자산</label>
+                    <input type="number" id="otherAssets" value="2000" class="input-field" min="0">
+                    <span>만원</span>
                 </div>
-                <div class="stage-card">
-                    <div class="stage-header">
-                        <span class="stage-number">2단계</span>
-                        <span class="stage-age">56~60세</span>
-                    </div>
-                    <div class="stage-goal">수입 다변화, 건강관리</div>
-                    <textarea class="stage-memo" id="stage2Memo" placeholder="최대 3줄 메모" rows="3" maxlength="150"></textarea>
-                </div>
-                <div class="stage-card">
-                    <div class="stage-header">
-                        <span class="stage-number">3단계</span>
-                        <span class="stage-age">61~65세</span>
-                    </div>
-                    <div class="stage-goal">은퇴 준비 완료</div>
-                    <textarea class="stage-memo" id="stage3Memo" placeholder="최대 3줄 메모" rows="3" maxlength="150"></textarea>
-                </div>
-                <div class="stage-card">
-                    <div class="stage-header">
-                        <span class="stage-number">4단계</span>
-                        <span class="stage-age">66세~</span>
-                    </div>
-                    <div class="stage-goal">안정적 생활 유지</div>
-                    <textarea class="stage-memo" id="stage4Memo" placeholder="최대 3줄 메모" rows="3" maxlength="150"></textarea>
+                <div class="asset-total">
+                    <strong>합계: <span id="totalAssets">10000</span>만원</strong>
                 </div>
             </div>
-        </section>
-
-        <!-- (3) 자산 & 수입 요약 -->
-        <section class="section">
-            <h2 class="section-title">자산 & 수입 요약</h2>
-            <div class="assets-grid">
-                <div class="assets-category">
-                    <h3>자산</h3>
-                    <div class="asset-item">
-                        <label>현금/예금</label>
-                        <input type="number" id="cash" value="5000" class="input-field" min="0">
-                        <span>만원</span>
-                    </div>
-                    <div class="asset-item">
-                        <label>연금</label>
-                        <input type="number" id="pension" value="3000" class="input-field" min="0">
-                        <span>만원</span>
-                    </div>
-                    <div class="asset-item">
-                        <label>기타 자산</label>
-                        <input type="number" id="otherAssets" value="2000" class="input-field" min="0">
-                        <span>만원</span>
-                    </div>
-                    <div class="asset-total">
-                        <strong>합계: <span id="totalAssets">10000</span>만원</strong>
-                    </div>
+            <div class="assets-category">
+                <h3>수입</h3>
+                <div class="asset-item">
+                    <label>근로 소득</label>
+                    <input type="number" id="workIncome" value="500" class="input-field" min="0">
+                    <span>만원/월</span>
                 </div>
-                <div class="assets-category">
-                    <h3>수입</h3>
-                    <div class="asset-item">
-                        <label>근로 소득</label>
-                        <input type="number" id="workIncome" value="500" class="input-field" min="0">
-                        <span>만원/월</span>
-                    </div>
-                    <div class="asset-item">
-                        <label>기타 소득</label>
-                        <input type="number" id="otherIncome" value="0" class="input-field" min="0">
-                        <span>만원/월</span>
-                    </div>
-                    <div class="asset-total">
-                        <strong>합계: <span id="totalIncome">500</span>만원/월</strong>
-                    </div>
+                <div class="asset-item">
+                    <label>기타 소득</label>
+                    <input type="number" id="otherIncome" value="0" class="input-field" min="0">
+                    <span>만원/월</span>
                 </div>
-                <div class="assets-category">
-                    <h3>지출</h3>
-                    <div class="asset-item">
-                        <label>고정 지출</label>
-                        <input type="number" id="fixedExpense" value="200" class="input-field" min="0">
-                        <span>만원/월</span>
-                    </div>
-                    <div class="asset-item">
-                        <label>생활비</label>
-                        <input type="number" id="livingExpense" value="150" class="input-field" min="0">
-                        <span>만원/월</span>
-                    </div>
-                    <div class="asset-total">
-                        <strong>합계: <span id="totalExpense">350</span>만원/월</strong>
-                    </div>
+                <div class="asset-total">
+                    <strong>합계: <span id="totalIncome">500</span>만원/월</strong>
                 </div>
             </div>
-        </section>
-
-        <!-- (4) 건강 & 생활 관리 -->
-        <section class="section">
-            <h2 class="section-title">건강 & 생활 관리</h2>
-            <div class="health-grid">
-                <div class="health-item">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="healthCheckup" class="checkbox">
-                        <span>정기검진 완료</span>
-                    </label>
+            <div class="assets-category">
+                <h3>지출</h3>
+                <div class="asset-item">
+                    <label>고정 지출</label>
+                    <input type="number" id="fixedExpense" value="200" class="input-field" min="0">
+                    <span>만원/월</span>
                 </div>
-                <div class="health-item">
-                    <label>운동 목표</label>
-                    <input type="text" id="exerciseGoal" value="주 3회 걷기" class="input-field">
+                <div class="asset-item">
+                    <label>생활비</label>
+                    <input type="number" id="livingExpense" value="150" class="input-field" min="0">
+                    <span>만원/월</span>
                 </div>
-                <div class="health-item">
-                    <label>생활 습관 메모</label>
-                    <input type="text" id="lifestyleMemo" value="" class="input-field" placeholder="짧은 메모">
-                </div>
-                <div class="health-item">
-                    <label>취미 / 여행 계획</label>
-                    <input type="text" id="hobbyPlan" value="" class="input-field" placeholder="짧은 메모">
+                <div class="asset-total">
+                    <strong>합계: <span id="totalExpense">350</span>만원/월</strong>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- (5) 메모 & 할 일 -->
-        <section class="section">
-            <h2 class="section-title">메모 & 할 일</h2>
-            <div class="memo-grid">
-                <div class="memo-item">
-                    <label>올해의 핵심 목표</label>
-                    <textarea id="yearGoal" class="memo-textarea" rows="2" placeholder="올해의 핵심 목표를 입력하세요"></textarea>
-                </div>
-                <div class="memo-item">
-                    <label>다음 점검 항목</label>
-                    <textarea id="nextCheck" class="memo-textarea" rows="2" placeholder="다음 점검 항목을 입력하세요"></textarea>
-                </div>
-                <div class="memo-item full-width">
-                    <label>자유 메모</label>
-                    <textarea id="freeMemo" class="memo-textarea" rows="3" placeholder="자유롭게 메모하세요"></textarea>
-                </div>
+    <!-- (4) 건강 & 생활 관리 -->
+    <section class="section">
+        <h2 class="section-title">건강 & 생활 관리</h2>
+        <div class="health-grid">
+            <div class="health-item">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="healthCheckup" class="checkbox">
+                    <span>정기검진 완료</span>
+                </label>
             </div>
-        </section>
-    </div>
+            <div class="health-item">
+                <label>운동 목표</label>
+                <input type="text" id="exerciseGoal" value="주 3회 걷기" class="input-field">
+            </div>
+            <div class="health-item">
+                <label>생활 습관 메모</label>
+                <input type="text" id="lifestyleMemo" value="" class="input-field" placeholder="짧은 메모">
+            </div>
+            <div class="health-item">
+                <label>취미 / 여행 계획</label>
+                <input type="text" id="hobbyPlan" value="" class="input-field" placeholder="짧은 메모">
+            </div>
+        </div>
+    </section>
 
-    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+    <!-- (5) 메모 & 할 일 -->
+    <section class="section">
+        <h2 class="section-title">메모 & 할 일</h2>
+        <div class="memo-grid">
+            <div class="memo-item">
+                <label>올해의 핵심 목표</label>
+                <textarea id="yearGoal" class="memo-textarea" rows="2" placeholder="올해의 핵심 목표를 입력하세요"></textarea>
+            </div>
+            <div class="memo-item">
+                <label>다음 점검 항목</label>
+                <textarea id="nextCheck" class="memo-textarea" rows="2" placeholder="다음 점검 항목을 입력하세요"></textarea>
+            </div>
+            <div class="memo-item full-width">
+                <label>자유 메모</label>
+                <textarea id="freeMemo" class="memo-textarea" rows="3" placeholder="자유롭게 메모하세요"></textarea>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block extra_scripts %}
     <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
-</body>
-</html>
-
+{% endblock %}

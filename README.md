@@ -282,11 +282,12 @@
 
 **🟡 중간 우선순위 - 단기 개선 권장**
 
-- [ ] **HTML 베이스 템플릿 생성**
+- [x] **HTML 베이스 템플릿 생성**
   - `templates/base.html` 템플릿 생성
-  - 네비게이션 바 등 공통 부분 분리
+  - 네비게이션 바 등 공통 부분 분리 (HTML 구조, CSS 링크, 공통 스크립트)
   - Flask 템플릿 상속 구조 적용 (`{% extends %}`)
-  - `dashboard.html`, `simulator.html` 템플릿 리팩토링
+  - `dashboard.html`, `simulator.html` 템플릿 리팩토링 (상속 구조로 변경)
+  - 블록 구조로 확장 가능한 템플릿 설계 (`{% block title %}`, `{% block content %}`, `{% block extra_scripts %}`)
   - 예상 작업 시간: 1시간
   - 영향도: 중간 (유지보수성 향상)
 
