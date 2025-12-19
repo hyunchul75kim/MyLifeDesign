@@ -306,10 +306,13 @@
 
 **🟡 중간 우선순위 / 🟢 낮은 우선순위**
 
-- [ ] **상수 관리 개선**
-  - 매직 넘버를 상수로 정의 (통화 단위, 계산 상수 등)
+- [x] **상수 관리 개선**
+  - `static/js/constants.js` 파일 생성 (모든 상수 중앙 관리)
+  - 매직 넘버를 상수로 정의 (통화 단위: `CURRENCY_UNITS`, 계산 상수: `CALCULATION_CONSTANTS`)
   - localStorage 키를 중앙 관리 (`STORAGE_KEYS` 객체)
-  - 하드코딩된 문자열 상수화
+  - 하드코딩된 문자열 상수화 (에러 메시지: `ERROR_MESSAGES`, 메시지 타입: `MESSAGE_TYPES`)
+  - 모든 JavaScript 파일에서 상수 사용하도록 리팩토링
+  - `base.html`에 `constants.js` 스크립트 추가 (로드 순서 보장)
   - 예상 작업 시간: 1시간
   - 영향도: 중간 (가독성 및 유지보수성 향상)
 

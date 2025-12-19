@@ -4,15 +4,20 @@
 (function() {
     'use strict';
 
+    // constants.js가 먼저 로드되어야 함
+    if (typeof window.STORAGE_KEYS === 'undefined') {
+        console.warn('constants.js가 로드되지 않았습니다. 상수를 사용할 수 없습니다.');
+    }
+
     /**
      * localStorage 사용 가능 여부 확인
      * @returns {boolean} localStorage 사용 가능 여부
      */
     window.isLocalStorageAvailable = function() {
         try {
-            const test = '__localStorage_test__';
-            localStorage.setItem(test, test);
-            localStorage.removeItem(test);
+            const testKey = window.LOCAL_STORAGE_TEST_KEY || '__localStorage_test__';
+            localStorage.setItem(testKey, testKey);
+            localStorage.removeItem(testKey);
             return true;
         } catch (e) {
             return false;
@@ -79,7 +84,12 @@
      */
     window.showUserMessage = function(message, type = 'error') {
         // 간단한 알림 방식 (향후 토스트 메시지로 개선 가능)
-        const messageType = type === 'error' ? '오류' : type === 'warning' ? '경고' : '알림';
+        const messageTypeLabels = window.MESSAGE_TYPE_LABELS || {
+            error: '오류',
+            warning: '경고',
+            info: '알림'
+        };
+        const messageType = messageTypeLabels[type] || messageTypeLabels.error;
         console.log(`[${messageType}] ${message}`);
         // 실제 사용자에게 보여주려면 UI 요소를 추가할 수 있음
     };

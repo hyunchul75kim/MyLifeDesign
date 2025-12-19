@@ -4,15 +4,17 @@
 (function() {
     'use strict';
 
-    // localStorage 키
-    const STORAGE_KEY = 'retirement_simulator_data';
+    // localStorage 키 (상수에서 가져오기)
+    const STORAGE_KEY = window.STORAGE_KEYS ? window.STORAGE_KEYS.SIMULATOR : 'retirement_simulator_data';
 
     // 숫자 포맷팅 (만원 단위)
     function formatNumber(value) {
-        if (value >= 10000) {
-            return (value / 10000).toFixed(1) + '억원';
-        } else if (value >= 1000) {
-            return (value / 1000).toFixed(1) + '천만원';
+        const units = window.CURRENCY_UNITS || { HUNDRED_MILLION: 10000, TEN_MILLION: 1000 };
+        
+        if (value >= units.HUNDRED_MILLION) {
+            return (value / units.HUNDRED_MILLION).toFixed(1) + '억원';
+        } else if (value >= units.TEN_MILLION) {
+            return (value / units.TEN_MILLION).toFixed(1) + '천만원';
         } else {
             return Math.round(value).toLocaleString() + '만원';
         }
@@ -32,36 +34,41 @@
             // 필수 요소 확인
             if (!currentAgeElement || !retirementAgeElement || !monthlyIncomeElement || 
                 !monthlyExpenseElement || !retirementPeriodElement || !annualReturnElement) {
-                console.error('필수 입력 요소를 찾을 수 없습니다.');
+                const errorMsg = window.ERROR_MESSAGES ? window.ERROR_MESSAGES.ELEMENT_NOT_FOUND : '필수 입력 요소를 찾을 수 없습니다.';
+                console.error(errorMsg);
                 return;
             }
 
-            const currentAge = parseFloat(currentAgeElement.value) || 0;
-            const retirementAge = parseFloat(retirementAgeElement.value) || 0;
-            const monthlyIncome = parseFloat(monthlyIncomeElement.value) || 0;
-            const monthlyExpense = parseFloat(monthlyExpenseElement.value) || 0;
-            const retirementPeriod = parseFloat(retirementPeriodElement.value) || 25;
-            const annualReturn = parseFloat(annualReturnElement.value) || 0;
+            const constants = window.CALCULATION_CONSTANTS || { MONTHS_PER_YEAR: 12, PERCENTAGE_DIVISOR: 100, DEFAULT_RETIREMENT_PERIOD: 25, MIN_VALUE: 0 };
+            const errorMessages = window.ERROR_MESSAGES || {};
+
+            const currentAge = parseFloat(currentAgeElement.value) || constants.MIN_VALUE;
+            const retirementAge = parseFloat(retirementAgeElement.value) || constants.MIN_VALUE;
+            const monthlyIncome = parseFloat(monthlyIncomeElement.value) || constants.MIN_VALUE;
+            const monthlyExpense = parseFloat(monthlyExpenseElement.value) || constants.MIN_VALUE;
+            const retirementPeriod = parseFloat(retirementPeriodElement.value) || constants.DEFAULT_RETIREMENT_PERIOD;
+            const annualReturn = parseFloat(annualReturnElement.value) || constants.MIN_VALUE;
 
             // 유효성 검사
             if (currentAge >= retirementAge) {
-                const errorMessage = '현재 나이는 은퇴 나이보다 작아야 합니다.';
-                window.showUserMessage(errorMessage, 'warning');
+                const errorMessage = errorMessages.AGE_VALIDATION || '현재 나이는 은퇴 나이보다 작아야 합니다.';
+                window.showUserMessage(errorMessage, window.MESSAGE_TYPES ? window.MESSAGE_TYPES.WARNING : 'warning');
                 const monthlySavingsElement = window.safeGetElement('monthlySavings');
                 const monthsToRetirementElement = window.safeGetElement('monthsToRetirement');
                 const expectedAssetsElement = window.safeGetElement('expectedAssets');
                 const monthlyLivingExpenseElement = window.safeGetElement('monthlyLivingExpense');
                 
-                if (monthlySavingsElement) monthlySavingsElement.textContent = '입력 오류';
-                if (monthsToRetirementElement) monthsToRetirementElement.textContent = '입력 오류';
-                if (expectedAssetsElement) expectedAssetsElement.textContent = '입력 오류';
-                if (monthlyLivingExpenseElement) monthlyLivingExpenseElement.textContent = '입력 오류';
+                const inputError = errorMessages.INPUT_ERROR || '입력 오류';
+                if (monthlySavingsElement) monthlySavingsElement.textContent = inputError;
+                if (monthsToRetirementElement) monthsToRetirementElement.textContent = inputError;
+                if (expectedAssetsElement) expectedAssetsElement.textContent = inputError;
+                if (monthlyLivingExpenseElement) monthlyLivingExpenseElement.textContent = inputError;
                 return;
             }
 
             // 계산
             const monthlySavings = monthlyIncome - monthlyExpense;
-            const monthsToRetirement = (retirementAge - currentAge) * 12;
+            const monthsToRetirement = (retirementAge - currentAge) * constants.MONTHS_PER_YEAR;
             
             // 단순 계산: 월 저축액 × 남은 개월 수
             // (수익률은 복잡하므로 단순화)
@@ -70,7 +77,7 @@
             // 수익률 적용 (간단한 복리 계산)
             if (annualReturn > 0 && monthsToRetirement > 0) {
                 try {
-                    const monthlyReturn = annualReturn / 100 / 12;
+                    const monthlyReturn = annualReturn / constants.PERCENTAGE_DIVISOR / constants.MONTHS_PER_YEAR;
                     // 복리 계산: FV = PV * (1 + r)^n
                     // 단순화: 평균 저축액에 대한 복리 효과
                     const avgSavings = monthlySavings * monthsToRetirement / 2;
@@ -86,7 +93,7 @@
                 }
             }
             
-            const monthlyLivingExpense = expectedAssets / (retirementPeriod * 12);
+            const monthlyLivingExpense = expectedAssets / (retirementPeriod * constants.MONTHS_PER_YEAR);
 
             // 결과 표시
             const monthlySavingsElement = window.safeGetElement('monthlySavings');
@@ -100,7 +107,8 @@
             if (monthlyLivingExpenseElement) monthlyLivingExpenseElement.textContent = formatNumber(monthlyLivingExpense);
         } catch (e) {
             console.error('계산 실패:', e);
-            window.showUserMessage('계산 중 오류가 발생했습니다. 입력값을 확인해주세요.', 'error');
+            const errorMsg = window.ERROR_MESSAGES ? window.ERROR_MESSAGES.CALCULATION_ERROR : '계산 중 오류가 발생했습니다. 입력값을 확인해주세요.';
+            window.showUserMessage(errorMsg, window.MESSAGE_TYPES ? window.MESSAGE_TYPES.ERROR : 'error');
         }
     }
 
@@ -128,18 +136,21 @@
 
             const saved = window.safeLocalStorageSet(STORAGE_KEY, data);
             if (!saved) {
-                window.showUserMessage('데이터 저장에 실패했습니다. 브라우저 저장 공간을 확인해주세요.', 'warning');
+                const errorMsg = window.ERROR_MESSAGES ? window.ERROR_MESSAGES.DATA_SAVE_FAILED : '데이터 저장에 실패했습니다. 브라우저 저장 공간을 확인해주세요.';
+                window.showUserMessage(errorMsg, window.MESSAGE_TYPES ? window.MESSAGE_TYPES.WARNING : 'warning');
             }
         } catch (e) {
             console.error('데이터 저장 중 오류:', e);
-            window.showUserMessage('데이터 저장 중 오류가 발생했습니다.', 'error');
+            const errorMsg = window.ERROR_MESSAGES ? window.ERROR_MESSAGES.DATA_SAVE_ERROR : '데이터 저장 중 오류가 발생했습니다.';
+            window.showUserMessage(errorMsg, window.MESSAGE_TYPES ? window.MESSAGE_TYPES.ERROR : 'error');
         }
     }
 
     // 데이터 로드
     function loadData() {
         if (!window.isLocalStorageAvailable()) {
-            window.showUserMessage('브라우저에서 데이터 저장 기능을 사용할 수 없습니다. 입력한 내용은 저장되지 않습니다.', 'warning');
+            const errorMsg = window.ERROR_MESSAGES ? window.ERROR_MESSAGES.STORAGE_UNAVAILABLE : '브라우저에서 데이터 저장 기능을 사용할 수 없습니다. 입력한 내용은 저장되지 않습니다.';
+            window.showUserMessage(errorMsg, window.MESSAGE_TYPES ? window.MESSAGE_TYPES.WARNING : 'warning');
             return;
         }
 
@@ -158,7 +169,8 @@
                 });
             } catch (e) {
                 console.error('데이터 적용 실패:', e);
-                window.showUserMessage('저장된 데이터를 불러오는 중 오류가 발생했습니다.', 'error');
+                const errorMsg = window.ERROR_MESSAGES ? window.ERROR_MESSAGES.DATA_LOAD_ERROR : '저장된 데이터를 불러오는 중 오류가 발생했습니다.';
+                window.showUserMessage(errorMsg, window.MESSAGE_TYPES ? window.MESSAGE_TYPES.ERROR : 'error');
             }
         }
     }

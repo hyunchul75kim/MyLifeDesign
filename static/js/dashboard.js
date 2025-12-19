@@ -4,13 +4,14 @@
 (function() {
     'use strict';
 
-    // localStorage 키
-    const STORAGE_KEY = 'retirement_dashboard_data';
+    // localStorage 키 (상수에서 가져오기)
+    const STORAGE_KEY = window.STORAGE_KEYS ? window.STORAGE_KEYS.DASHBOARD : 'retirement_dashboard_data';
 
     // 데이터 로드
     function loadData() {
         if (!window.isLocalStorageAvailable()) {
-            window.showUserMessage('브라우저에서 데이터 저장 기능을 사용할 수 없습니다. 입력한 내용은 저장되지 않습니다.', 'warning');
+            const errorMsg = window.ERROR_MESSAGES ? window.ERROR_MESSAGES.STORAGE_UNAVAILABLE : '브라우저에서 데이터 저장 기능을 사용할 수 없습니다. 입력한 내용은 저장되지 않습니다.';
+            window.showUserMessage(errorMsg, window.MESSAGE_TYPES ? window.MESSAGE_TYPES.WARNING : 'warning');
             return;
         }
 
@@ -36,7 +37,8 @@
                 calculateTotals();
             } catch (e) {
                 console.error('데이터 적용 실패:', e);
-                window.showUserMessage('저장된 데이터를 불러오는 중 오류가 발생했습니다.', 'error');
+                const errorMsg = window.ERROR_MESSAGES ? window.ERROR_MESSAGES.DATA_LOAD_ERROR : '저장된 데이터를 불러오는 중 오류가 발생했습니다.';
+                window.showUserMessage(errorMsg, window.MESSAGE_TYPES ? window.MESSAGE_TYPES.ERROR : 'error');
             }
         }
     }
@@ -66,11 +68,13 @@
             
             const saved = window.safeLocalStorageSet(STORAGE_KEY, data);
             if (!saved) {
-                window.showUserMessage('데이터 저장에 실패했습니다. 브라우저 저장 공간을 확인해주세요.', 'warning');
+                const errorMsg = window.ERROR_MESSAGES ? window.ERROR_MESSAGES.DATA_SAVE_FAILED : '데이터 저장에 실패했습니다. 브라우저 저장 공간을 확인해주세요.';
+                window.showUserMessage(errorMsg, window.MESSAGE_TYPES ? window.MESSAGE_TYPES.WARNING : 'warning');
             }
         } catch (e) {
             console.error('데이터 저장 중 오류:', e);
-            window.showUserMessage('데이터 저장 중 오류가 발생했습니다.', 'error');
+            const errorMsg = window.ERROR_MESSAGES ? window.ERROR_MESSAGES.DATA_SAVE_ERROR : '데이터 저장 중 오류가 발생했습니다.';
+            window.showUserMessage(errorMsg, window.MESSAGE_TYPES ? window.MESSAGE_TYPES.ERROR : 'error');
         }
     }
 
@@ -116,7 +120,8 @@
             }
         } catch (e) {
             console.error('합계 계산 실패:', e);
-            window.showUserMessage('합계 계산 중 오류가 발생했습니다.', 'error');
+            const errorMsg = window.ERROR_MESSAGES ? window.ERROR_MESSAGES.TOTAL_CALCULATION_ERROR : '합계 계산 중 오류가 발생했습니다.';
+            window.showUserMessage(errorMsg, window.MESSAGE_TYPES ? window.MESSAGE_TYPES.ERROR : 'error');
         }
     }
 
